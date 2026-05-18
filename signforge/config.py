@@ -9,8 +9,6 @@ class DataConfig:
     train_path: str
     dev_path: str
     test_path: str
-    input_modality: str = "feature"
-    feature_dim: int = 1024
     pose_dim: int = 534
     sbert_sim_path: Optional[str] = None
 
@@ -18,8 +16,6 @@ class DataConfig:
 @dataclass
 class EncoderConfig:
     type: str = "vanilla"
-    num_keys: int = 5
-    query_nb: int = 5
 
 
 @dataclass
@@ -36,8 +32,6 @@ class ModelConfig:
 @dataclass
 class LossConfig:
     label_smoothing: float = 0.1
-    auxiliary_type: str = "none"
-    auxiliary_weight: float = 1.0
 
 
 @dataclass
@@ -54,7 +48,7 @@ class TrainingConfig:
 @dataclass
 class EvalConfig:
     metrics: list = field(default_factory=lambda: ["bleu", "rouge"])
-    beam_sizes: list = field(default_factory=lambda: [1, 2, 3, 4, 5])
+    beam_size: int = 4
     length_penalty: float = 0.6
 
 
@@ -85,13 +79,9 @@ class Config:
             data=DataConfig(**raw["data"]),
             model=ModelConfig(
                 **{k: v for k, v in raw["model"].items() if k != "encoder"},
-                encoder=EncoderConfig(**raw["model"].get("encoder_params", {}), type=raw["model"].get("encoder", "vanilla")),
+                encoder=EncoderConfig(**raw["model"].get("encoder", {})),
             ),
-            loss=LossConfig(
-                label_smoothing=raw["loss"]["ce"]["label_smoothing"],
-                auxiliary_type=raw["loss"]["auxiliary"].get("type", "none"),
-                auxiliary_weight=raw["loss"]["auxiliary"].get("weight", 1.0),
-            ),
+            loss=LossConfig(**raw["loss"]),
             training=TrainingConfig(**raw["training"]),
             evaluation=EvalConfig(**raw["evaluation"]),
             output=OutputConfig(**raw["output"]),

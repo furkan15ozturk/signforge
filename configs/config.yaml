@@ -1,0 +1,41 @@
+project: SignForge
+
+data:
+  dataset: PHOENIX2014T
+  train_path: ../data/PHOENIX2014T/phoenix14t.pami0.train
+  dev_path: ../data/PHOENIX2014T/phoenix14t.pami0.dev
+  test_path: ../data/PHOENIX2014T/phoenix14t.pami0.test
+  pose_dim: 534
+  sbert_sim_path: ../data/sbert_similarity.pt
+
+model:
+  d_model: 256
+  num_heads: 4
+  ffn_dim: 512
+  num_layers: 2
+  max_len: 512
+  dropout: 0.1
+  encoder:
+    type: vanilla
+
+loss:
+  label_smoothing: 0.1
+
+training:
+  epochs: 100
+  batch_size: 32
+  lr: 0.0003
+  weight_decay: 0.00001
+  clip_grad: 1.0
+  warmup_steps: 200
+  patience: 10
+
+evaluation:
+  metrics: [bleu, rouge]
+  beam_size: 4
+  length_penalty: 0.6
+
+output:
+  checkpoint_dir: checkpoints
+  log_dir: logs
+  run_name: slt_baseline_vanilla
